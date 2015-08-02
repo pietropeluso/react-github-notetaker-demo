@@ -1,11 +1,21 @@
-import React from 'react';
+var React = require('react');
+var RouteHandler = require('react-router').RouteHandler;
 
-export class Main extends React.Component {
-  render() {
+var Main = React.createClass({
+  render: function() {
     return (
-      <div>Hello world</div>
-    );
+      <div className="main-container">
+        <nav className="navbar navbar-default" role="navigation">
+          <div className="col-sm-7 col-sm-offset-2">
+            MENU
+          </div>
+        </nav>
+        <div className="container">
+          <RouteHandler />
+        </div>
+      </div>
+    )
   }
-}
+});
 
-React.render(<Main />, document.getElementById("app"));
+module.exports = Main;
