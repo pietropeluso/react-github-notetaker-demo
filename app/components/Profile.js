@@ -9,8 +9,7 @@ var helpers = require('../utils/helper');
 
 var Profile = React.createClass({
   mixins : [Router.State, ReactFireMixin],
-  componentDidMount: function() {
-    this.ref = new Firebase("https://github-notetaker-react.firebaseio.com");
+  init: function() {
     var childRef = this.ref.child(this.getParams().username);
     this.bindAsArray(childRef, 'notes');
     var self = this;
@@ -23,8 +22,16 @@ var Profile = React.createClass({
       });
     });
   },
+  componentDidMount: function() {
+    this.ref = new Firebase("https://github-notetaker-react.firebaseio.com");
+    this.init();
+  },
   componentWillUnmount: function() {
     this.unbind('notes');
+  },
+  componentWillReceiveProps: function() {
+    this.unbind('notes');
+    this.init();
   },
   getInitialState: function() {
     return {
