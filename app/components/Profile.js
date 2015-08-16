@@ -23,11 +23,9 @@ class Profile extends React.Component {
       state: 'notes'
     });
 
-    var self = this;
-
     helpers.getGithubData(this.router.getCurrentParams().username)
-    .then(function(response){
-      self.setState({
+    .then((response) => {
+      this.setState({
         repos: response.repos,
         bio: response.bio
       });
