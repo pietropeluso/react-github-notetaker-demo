@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "work": "webpack -w"
+    "build": "webpack-dev-server --inline --hot"
   },
   "author": "Pietro Peluso",
   "license": "ISC",
@@ -18,5 +18,8 @@
     "react-router": "^0.13.3",
     "reactfire": "^0.4.0",
     "webpack": "^1.10.5"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^1.10.1"
   }
 }
