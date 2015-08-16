@@ -1,50 +1,58 @@
-var React = require('react');
-var Router = require('react-router');
-var Repos = require('./Github/Repos');
-var UserProfile = require('./Github/UserProfile');
-var Notes = require('./Notes/Notes');
-var Firebase = require('firebase');
-var ReactFireMixin = require('reactfire');
-var helpers = require('../utils/helper');
+import React from 'react';
+import Repos from './Github/Repos';
+import UserProfile from './Github/UserProfile';
+import Notes from './Notes/Notes';
+import helpers from '../utils/helper';
+import Rebase from 're-base';
 
-var Profile = React.createClass({
-  mixins : [Router.State, ReactFireMixin],
-  init: function() {
-    var childRef = this.ref.child(this.getParams().username);
-    this.bindAsArray(childRef, 'notes');
+var base = Rebase.createClass("https://github-notetaker-react.firebaseio.com");
+
+class Profile extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      notes : [],
+      bio : {},
+      repos : []
+    };
+  }
+  init() {
+    this.ref = base.bindToState(this.router.getCurrentParams().username, {
+      context: this,
+      asArray: true,
+      state: 'notes'
+    });
+
     var self = this;
 
-    helpers.getGithubData(this.getParams().username)
+    helpers.getGithubData(this.router.getCurrentParams().username)
     .then(function(response){
       self.setState({
         repos: response.repos,
         bio: response.bio
       });
+     });
+  }
+  componentWillMount() {
+    this.router = this.context.router;
+  }
+  componentDidMount() {
+    this.init();
+  }
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+  componentWillReceiveProps() {
+    base.removeBinding(this.ref);
+    this.init();
+  }
+  handleNewNote(newNote) {
+    base.post(this.router.getCurrentParams().username, {
+      data: this.state.notes.concat([newNote])
     });
-  },
-  componentDidMount: function() {
-    this.ref = new Firebase("https://github-notetaker-react.firebaseio.com");
-    this.init();
-  },
-  componentWillUnmount: function() {
-    this.unbind('notes');
-  },
-  componentWillReceiveProps: function() {
-    this.unbind('notes');
-    this.init();
-  },
-  getInitialState: function() {
-    return {
-      notes : [],
-      bio : {},
-      repos : []
-    }
-  },
-  handleNewNote: function(newNote) {
-    this.ref.child(this.getParams().username).set(this.state.notes.concat([newNote]));
-  },
-  render: function() {
-    var username = this.getParams().username;
+  }
+  render() {
+    var username = this.router.getCurrentParams().username;
     return (
       <div className="row">
         <div className="col-md-4">
@@ -54,11 +62,15 @@ var Profile = React.createClass({
           <Repos username={username} repos={this.state.repos} />
         </div>
         <div className="col-md-4">
-          <Notes username={username} notes={this.state.notes} addNote={this.handleNewNote} />
+          <Notes username={username} notes={this.state.notes} addNote={this.handleNewNote.bind(this)} />
         </div>
       </div>
     )
   }
-});
+};
 
-module.exports = Profile;
+Profile.contextTypes = {
+  router: React.PropTypes.func.isRequired
+};
+
+export default Profile;

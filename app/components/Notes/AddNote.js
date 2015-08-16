@@ -11,7 +11,7 @@ class AddNote extends React.Component {
       <div className="input-group">
         <input type="text" className="form-control" ref="note" placeholder="Add a new note here..." />
         <span className="input-group-btn">
-          <button className="btn btn-default" type="button" onClick={this.handleSubmit.bind(this )}>Add</button>
+          <button className="btn btn-default" type="button" onClick={this.handleSubmit.bind(this)}>Add</button>
         </span>
       </div>
     );
